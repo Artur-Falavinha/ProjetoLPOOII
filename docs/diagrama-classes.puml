@@ -1,0 +1,97 @@
+@startuml
+
+title Diagrama de classes - Projeto LPOOII
+
+package "Model" {
+    class Cliente {
+        +id : Integer
+        +nome : String
+        +sobrenome : String
+        +rg : String
+        +cpf : String
+        +endereco : String
+    }
+
+    class Locacao {
+        +id : Integer
+        +dias : int
+        +valor : double
+        +data : Calendar
+    }
+
+    interface VeiculoI {
+        +locar(dias, data, cliente)
+        +vender()
+        +devolver()
+        +getValorParaVenda()
+        +getValorDiariaLocacao()
+    }
+
+    abstract class Veiculo implements VeiculoI {
+        -id : Integer
+        -marca : Marca
+        -estado : Estado
+        -categoria : Categoria
+        -valorDeCompra : double
+        -placa : String
+        -ano : int
+    }
+
+    class Automovel extends Veiculo {
+        -modelo : ModeloAutomovel
+    }
+
+    class Motocicleta extends Veiculo {
+        -modelo : ModeloMotocicleta
+    }
+
+    class Van extends Veiculo {
+        -modelo : ModeloVan
+    }
+
+    Cliente "1" <-- "1" Locacao
+    Veiculo "1" o-- "0..1" Locacao
+}
+
+package "DAO" {
+    class ClienteDAO
+    class VeiculoDAO
+    class LocacaoDAO
+    class HistoricoVendaDAO
+}
+
+package "Controller" {
+    class ClienteControlador
+    class VeiculoControlador
+    class LocacaoControlador
+    class VendaControlador
+}
+
+package "View" {
+    class TelaPrincipal
+    class TelaClientes
+    class TelaCadastroVeiculo
+    class TelaLocacao
+    class TelaDevolucao
+    class TelaVenda
+}
+
+ClienteControlador --> ClienteDAO
+VeiculoControlador --> VeiculoDAO
+VeiculoControlador --> ClienteDAO
+LocacaoControlador --> VeiculoDAO
+LocacaoControlador --> LocacaoDAO
+VendaControlador --> VeiculoDAO
+VendaControlador --> HistoricoVendaDAO
+
+TelaClientes --> ClienteControlador
+TelaCadastroVeiculo --> VeiculoControlador
+TelaLocacao --> ClienteControlador
+TelaLocacao --> VeiculoControlador
+TelaLocacao --> LocacaoControlador
+TelaDevolucao --> VeiculoControlador
+TelaDevolucao --> LocacaoControlador
+TelaVenda --> VeiculoControlador
+TelaVenda --> VendaControlador
+
+@enduml
