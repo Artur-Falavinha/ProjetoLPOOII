@@ -53,7 +53,7 @@ public class TelaCadastroVeiculo extends JDialog {
         JPanel painelPrincipal = new JPanel(new BorderLayout(10, 10));
         painelPrincipal.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JPanel painelFormulario = new JPanel(new GridLayout(7, 2, 8, 8));
+        JPanel painelFormulario = new JPanel(new GridLayout(8, 2, 8, 8));
         painelFormulario.setBorder(BorderFactory.createTitledBorder("Dados do veículo"));
         painelFormulario.add(TelaUtil.rotulo("Tipo"));
         painelFormulario.add(comboTipo);

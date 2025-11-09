@@ -75,7 +75,7 @@ public class TelaLocacao extends JDialog {
     }
 
     private JPanel criarPainelFiltros() {
-        JPanel painelFiltros = new JPanel(new GridLayout(2, 4, 5, 5));
+        JPanel painelFiltros = new JPanel(new GridLayout(3, 4, 5, 5));
         painelFiltros.setBorder(BorderFactory.createTitledBorder("Filtros"));
 
         JButton botaoPesquisarCliente = new JButton("Buscar cliente");

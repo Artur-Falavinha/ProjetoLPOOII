@@ -59,7 +59,7 @@ public class TelaVenda extends JDialog {
     }
 
     private JPanel criarPainelFiltros() {
-        JPanel painel = new JPanel(new GridLayout(2, 3, 5, 5));
+        JPanel painel = new JPanel(new GridLayout(3, 3, 5, 5));
         painel.setBorder(BorderFactory.createTitledBorder("Filtros"));
 
         painel.add(TelaUtil.rotulo("Marca"));
