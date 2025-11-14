@@ -4,19 +4,73 @@ title Diagrama de classes - Projeto LPOOII
 
 package "Model" {
     class Cliente {
-        +id : Integer
-        +nome : String
-        +sobrenome : String
-        +rg : String
-        +cpf : String
-        +endereco : String
+        -id : Integer
+        -nome : String
+        -sobrenome : String
+        -rg : String
+        -cpf : String
+        -endereco : String
+        +getId() : Integer
+        +getNome() : String
+        +getCpf() : String
     }
 
     class Locacao {
-        +id : Integer
-        +dias : int
-        +valor : double
-        +data : Calendar
+        -id : Integer
+        -dias : int
+        -valor : double
+        -data : Calendar
+        -cliente : Cliente
+        +getId() : Integer
+        +getDias() : int
+        +getValor() : double
+        +getData() : Calendar
+        +getCliente() : Cliente
+    }
+
+    enum Marca {
+        FIAT
+        VOLKSWAGEN
+        CHEVROLET
+        FORD
+        HONDA
+        YAMAHA
+        RENAULT
+    }
+
+    enum Estado {
+        DISPONIVEL
+        LOCADO
+        VENDIDO
+    }
+
+    enum Categoria {
+        POPULAR
+        INTERMEDIARIO
+        LUXO
+    }
+
+    enum TipoVeiculo {
+        AUTOMOVEL
+        MOTOCICLETA
+        VAN
+    }
+
+    enum ModeloAutomovel {
+        SEDAN
+        HATCH
+        SUV
+    }
+
+    enum ModeloMotocicleta {
+        SPORT
+        CUSTOM
+        TRAIL
+    }
+
+    enum ModeloVan {
+        CARGO
+        PASSAGEIROS
     }
 
     interface VeiculoI {
@@ -35,36 +89,112 @@ package "Model" {
         -valorDeCompra : double
         -placa : String
         -ano : int
+        -locacao : Locacao
+        +getId() : Integer
+        +getMarca() : Marca
+        +getEstado() : Estado
+        +getCategoria() : Categoria
+        +getPlaca() : String
+        +getAno() : int
+        +getValorDeCompra() : double
+        +getLocacao() : Locacao
+        +locar(dias, data, cliente)
+        +vender()
+        +devolver()
+        +getValorParaVenda() : double
     }
 
     class Automovel extends Veiculo {
         -modelo : ModeloAutomovel
+        +getModelo() : ModeloAutomovel
+        +getValorDiariaLocacao() : double
     }
 
     class Motocicleta extends Veiculo {
         -modelo : ModeloMotocicleta
+        +getModelo() : ModeloMotocicleta
+        +getValorDiariaLocacao() : double
     }
 
     class Van extends Veiculo {
         -modelo : ModeloVan
+        +getModelo() : ModeloVan
+        +getValorDiariaLocacao() : double
     }
 
     Cliente "1" <-- "1" Locacao
     Veiculo "1" o-- "0..1" Locacao
+    Veiculo --> Marca
+    Veiculo --> Estado
+    Veiculo --> Categoria
+    Automovel --> ModeloAutomovel
+    Motocicleta --> ModeloMotocicleta
+    Van --> ModeloVan
 }
 
 package "DAO" {
-    class ClienteDAO
-    class VeiculoDAO
-    class LocacaoDAO
-    class HistoricoVendaDAO
+    class ClienteDAO {
+        +inserir(cliente) : Cliente
+        +atualizar(cliente)
+        +buscarPorId(id) : Cliente
+        +buscarPorTermo(termo) : List<Cliente>
+        +listarTodos() : List<Cliente>
+    }
+
+    class VeiculoDAO {
+        +inserir(veiculo, tipo, modelo) : Veiculo
+        +atualizarEstado(id, estado)
+        +placaExiste(placa) : boolean
+        +buscarPorId(id, clienteDAO) : Veiculo
+        +listarDisponiveisParaLocacao(...) : List<Veiculo>
+        +listarLocados(clienteDAO) : List<Veiculo>
+        +listarDisponiveisParaVenda(...) : List<Veiculo>
+    }
+
+    class LocacaoDAO {
+        +registrar(idVeiculo, locacao, idCliente)
+        +removerPorVeiculo(idVeiculo)
+    }
+
+    class HistoricoVendaDAO {
+        +registrar(idVeiculo, valorVenda, data)
+    }
 }
 
 package "Controller" {
-    class ClienteControlador
-    class VeiculoControlador
-    class LocacaoControlador
-    class VendaControlador
+    class ClienteControlador {
+        -clienteDAO : ClienteDAO
+        +cadastrar(nome, sobrenome, rg, cpf, endereco) : Cliente
+        +atualizar(cliente)
+        +buscarPorTermo(termo) : List<Cliente>
+        +listarTodos() : List<Cliente>
+    }
+
+    class VeiculoControlador {
+        -veiculoDAO : VeiculoDAO
+        -clienteDAO : ClienteDAO
+        +cadastrarAutomovel(...) : Veiculo
+        +cadastrarMotocicleta(...) : Veiculo
+        +cadastrarVan(...) : Veiculo
+        +listarDisponiveisParaLocacao(...) : List<Veiculo>
+        +listarLocados() : List<Veiculo>
+        +listarDisponiveisParaVenda(...) : List<Veiculo>
+        +buscarPorId(id) : Veiculo
+        +atualizarEstado(id, estado)
+    }
+
+    class LocacaoControlador {
+        -veiculoDAO : VeiculoDAO
+        -locacaoDAO : LocacaoDAO
+        +locarVeiculo(veiculo, cliente, dias, data) : Locacao
+        +devolverVeiculo(veiculo)
+    }
+
+    class VendaControlador {
+        -veiculoDAO : VeiculoDAO
+        -historicoVendaDAO : HistoricoVendaDAO
+        +venderVeiculo(veiculo, data)
+    }
 }
 
 package "View" {
