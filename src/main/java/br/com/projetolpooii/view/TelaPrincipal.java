@@ -51,18 +51,8 @@ public class TelaPrincipal extends JFrame {
         menuOperacoes.add(itemDevolucao);
         menuOperacoes.add(itemVenda);
 
-        // Menu de ajuda com informações sobre o sistema
-        JMenu menuAjuda = new JMenu("Ajuda");
-        JMenuItem itemSobre = new JMenuItem("Sobre");
-        itemSobre.addActionListener(e -> JOptionPane.showMessageDialog(this,
-                "Sistema de locação de veículos desenvolvido para a disciplina LPOO II.",
-                "Sobre",
-                JOptionPane.INFORMATION_MESSAGE));
-        menuAjuda.add(itemSobre);
-
         barra.add(menuCadastros);
         barra.add(menuOperacoes);
-        barra.add(menuAjuda);
 
         setJMenuBar(barra);
     }
