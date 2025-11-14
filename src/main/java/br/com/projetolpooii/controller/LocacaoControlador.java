@@ -1,5 +1,6 @@
 package br.com.projetolpooii.controller;
 
+// Controlador que gerencia as locações e devoluções
 import br.com.projetolpooii.dao.LocacaoDAO;
 import br.com.projetolpooii.dao.VeiculoDAO;
 import br.com.projetolpooii.model.Cliente;
@@ -20,24 +21,26 @@ public class LocacaoControlador {
         this.locacaoDAO = locacaoDAO;
     }
 
+    // Faz a locação de um veículo pra um cliente
     public Locacao locarVeiculo(Veiculo veiculo, Cliente cliente, int dias, Calendar data) throws SQLException {
         if (cliente.getId() == null) {
             throw new IllegalArgumentException("Cliente precisa estar salvo para realizar locação.");
         }
-        // O próprio objeto veículo aplica regras de negócio ao mudar o estado para LOCADO.
+        // Chama o método locar do veículo que já faz as validações
         veiculo.locar(dias, data, cliente);
         Locacao locacao = veiculo.getLocacao();
-        // Primeiro registramos a locação para respeitar a restrição de veículo único.
+        // Salva a locação no banco e atualiza o estado do veículo
         locacaoDAO.registrar(veiculo.getId(), locacao, cliente.getId());
         veiculoDAO.atualizarEstado(veiculo.getId(), Estado.LOCADO);
         return locacao;
     }
 
+    // Processa a devolução de um veículo
     public void devolverVeiculo(Veiculo veiculo) throws SQLException {
         if (veiculo.getLocacao() == null) {
             throw new IllegalStateException("Veículo não possui locação ativa.");
         }
-        // Removemos o registro antes de mudar o estado para evitar registros órfãos.
+        // Remove a locação do banco e volta o veículo pro estado disponível
         locacaoDAO.removerPorVeiculo(veiculo.getId());
         veiculo.devolver();
         veiculoDAO.atualizarEstado(veiculo.getId(), Estado.DISPONIVEL);

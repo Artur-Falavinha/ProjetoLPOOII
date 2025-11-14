@@ -1,5 +1,6 @@
 package br.com.projetolpooii.dao;
 
+// Classe que faz as operações de banco de dados dos veículos
 import br.com.projetolpooii.infra.FabricaDeConexao;
 import br.com.projetolpooii.model.Automovel;
 import br.com.projetolpooii.model.Cliente;
@@ -26,6 +27,7 @@ import java.util.List;
 
 public class VeiculoDAO {
 
+    // Insere um veículo novo no banco e retorna com o ID gerado
     public Veiculo inserir(Veiculo veiculo, TipoVeiculo tipo, String modelo) throws SQLException {
         String sql = "INSERT INTO veiculo (tipo, marca, categoria, estado, modelo, placa, ano, valor_compra, valor_locacao_diaria) " +
                 "VALUES (?,?,?,?,?,?,?,?,?)";
@@ -41,6 +43,7 @@ public class VeiculoDAO {
             ps.setDouble(8, veiculo.getValorDeCompra());
             ps.setDouble(9, veiculo.getValorDiariaLocacao());
             ps.executeUpdate();
+            // Pega o ID que o banco gerou automaticamente
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     veiculo.setId(rs.getInt(1));
@@ -50,6 +53,7 @@ public class VeiculoDAO {
         return veiculo;
     }
 
+    // Atualiza o estado do veículo (disponivel, locado, vendido)
     public void atualizarEstado(int idVeiculo, Estado novoEstado) throws SQLException {
         String sql = "UPDATE veiculo SET estado = ? WHERE id_veiculo = ?";
         try (Connection conexao = FabricaDeConexao.obterConexao();
@@ -60,6 +64,7 @@ public class VeiculoDAO {
         }
     }
 
+    // Verifica se já tem algum veículo com essa placa cadastrado
     public boolean placaExiste(String placa) throws SQLException {
         String sql = "SELECT COUNT(*) FROM veiculo WHERE placa = ?";
         try (Connection conexao = FabricaDeConexao.obterConexao();
@@ -88,12 +93,14 @@ public class VeiculoDAO {
         }
     }
 
+    // Busca veículos disponíveis pra locação, monta a query dinamicamente com os filtros
     public List<Veiculo> listarDisponiveisParaLocacao(String termoMarca,
                                                        Categoria categoriaFiltro,
                                                        TipoVeiculo tipoFiltro,
                                                        ClienteDAO clienteDAO) throws SQLException {
         StringBuilder sql = new StringBuilder("SELECT * FROM veiculo v LEFT JOIN locacao l ON l.id_veiculo = v.id_veiculo WHERE v.estado = 'DISPONIVEL'");
         List<Object> parametros = new ArrayList<>();
+        // Se passou filtro de marca, adiciona na query
         if (termoMarca != null && !termoMarca.isBlank()) {
             sql.append(" AND v.marca LIKE ?");
             parametros.add("%" + termoMarca + "%");
@@ -119,6 +126,7 @@ public class VeiculoDAO {
         }
     }
 
+    // Pega todos os veículos que estão locados, fazendo join com a tabela de locação
     public List<Veiculo> listarLocados(ClienteDAO clienteDAO) throws SQLException {
         String sql = "SELECT * FROM veiculo v INNER JOIN locacao l ON l.id_veiculo = v.id_veiculo WHERE v.estado = 'LOCADO'";
         try (Connection conexao = FabricaDeConexao.obterConexao();
@@ -163,6 +171,7 @@ public class VeiculoDAO {
         }
     }
 
+    // Método auxiliar pra montar o PreparedStatement com os parâmetros dinâmicos
     private PreparedStatement prepararComando(Connection conexao, String sql, List<Object> parametros) throws SQLException {
         PreparedStatement ps = conexao.prepareStatement(sql);
         for (int i = 0; i < parametros.size(); i++) {
@@ -171,7 +180,9 @@ public class VeiculoDAO {
         return ps;
     }
 
+    // Converte os dados do ResultSet em objetos Veículo
     private Veiculo mapearVeiculo(ResultSet rs, ClienteDAO clienteDAO) throws SQLException {
+        // Pega todos os campos do banco
         TipoVeiculo tipo = TipoVeiculo.valueOf(rs.getString("tipo"));
         Marca marca = Marca.valueOf(rs.getString("marca"));
         Categoria categoria = Categoria.valueOf(rs.getString("categoria"));
@@ -182,6 +193,7 @@ public class VeiculoDAO {
         int id = rs.getInt("id_veiculo");
         String modelo = rs.getString("modelo");
 
+        // Cria o objeto correto dependendo do tipo (polimorfismo aqui)
         Veiculo veiculo = switch (tipo) {
             case AUTOMOVEL -> new Automovel(id, marca, estado, categoria, valorCompra, placa, ano,
                     ModeloAutomovel.valueOf(modelo));
@@ -192,7 +204,7 @@ public class VeiculoDAO {
         };
 
         if (estado == Estado.LOCADO) {
-            // Quando o veículo está locado precisamos reconstruir o objeto Locacao para a tela de devolução.
+            // Se tá locado, precisa reconstruir o objeto Locação com os dados do banco
             int dias = rs.getInt("dias");
             double valorTotal = rs.getDouble("valor_total");
             java.sql.Date dataLocacao = rs.getDate("data_locacao");

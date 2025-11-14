@@ -25,15 +25,20 @@ import java.awt.Window;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 
+// Tela pra cadastrar os veículos no sistema
 public class TelaCadastroVeiculo extends JDialog {
 
+    // Controlador que vai fazer a ponte com o banco de dados
     private final VeiculoControlador veiculoControlador;
 
+    // Combos com as opções de tipo, marca, estado, etc
     private final javax.swing.JComboBox<TipoVeiculo> comboTipo = new javax.swing.JComboBox<>(TipoVeiculo.values());
     private final javax.swing.JComboBox<Marca> comboMarca = new javax.swing.JComboBox<>(Marca.values());
     private final javax.swing.JComboBox<Estado> comboEstado = new javax.swing.JComboBox<>(Estado.values());
     private final javax.swing.JComboBox<Categoria> comboCategoria = new javax.swing.JComboBox<>(Categoria.values());
     private final javax.swing.JComboBox<String> comboModelo = new javax.swing.JComboBox<>();
+    
+    // Campos de texto formatados pra valor e placa
     private final JFormattedTextField campoValorCompra;
     private final JFormattedTextField campoPlaca;
     private final JTextField campoAno = new JTextField();
@@ -50,9 +55,11 @@ public class TelaCadastroVeiculo extends JDialog {
     }
 
     private void configurarComponentes() {
+        // Monta o layout da tela com os campos do formulário
         JPanel painelPrincipal = new JPanel(new BorderLayout(10, 10));
         painelPrincipal.setBorder(new EmptyBorder(10, 10, 10, 10));
 
+        // Grid com 8 linhas e 2 colunas pros campos
         JPanel painelFormulario = new JPanel(new GridLayout(8, 2, 8, 8));
         painelFormulario.setBorder(BorderFactory.createTitledBorder("Dados do veículo"));
         painelFormulario.add(TelaUtil.rotulo("Tipo"));
@@ -72,6 +79,7 @@ public class TelaCadastroVeiculo extends JDialog {
         painelFormulario.add(TelaUtil.rotulo("Ano"));
         painelFormulario.add(campoAno);
 
+        // Quando muda o tipo de veículo, atualiza os modelos disponíveis
         comboTipo.addActionListener(e -> atualizarModelos());
 
         JPanel painelBotoes = new JPanel();
@@ -88,11 +96,13 @@ public class TelaCadastroVeiculo extends JDialog {
         setContentPane(painelPrincipal);
     }
 
+    // Atualiza o combo de modelos baseado no tipo selecionado
     private void atualizarModelos() {
         TipoVeiculo tipoSelecionado = (TipoVeiculo) comboTipo.getSelectedItem();
         if (tipoSelecionado == null) {
             return;
         }
+        // Dependendo do tipo escolhido, carrega os modelos específicos
         switch (tipoSelecionado) {
             case AUTOMOVEL -> comboModelo.setModel(new DefaultComboBoxModel<>(
                     textoModelos(ModeloAutomovel.values())));
@@ -111,6 +121,7 @@ public class TelaCadastroVeiculo extends JDialog {
         return textos;
     }
 
+    // Pega os dados do formulário e salva no banco
     private void salvarVeiculo() {
         try {
             double valorCompra = ((Number) campoValorCompra.getValue()).doubleValue();
@@ -123,6 +134,7 @@ public class TelaCadastroVeiculo extends JDialog {
             Categoria categoria = (Categoria) comboCategoria.getSelectedItem();
             String modeloTexto = (String) comboModelo.getSelectedItem();
 
+            // Chama o método correto do controlador dependendo do tipo
             if (tipo == TipoVeiculo.AUTOMOVEL) {
                 veiculoControlador.cadastrarAutomovel(marca, estado, categoria, valorCompra, placa, ano,
                         ModeloAutomovel.valueOf(modeloTexto));
@@ -158,6 +170,7 @@ public class TelaCadastroVeiculo extends JDialog {
         atualizarModelos();
     }
 
+    // Cria um campo formatado pra valores em dinheiro
     private JFormattedTextField criarCampoMonetario() {
         NumberFormat formato = NumberFormat.getNumberInstance();
         formato.setMinimumFractionDigits(2);
@@ -167,11 +180,12 @@ public class TelaCadastroVeiculo extends JDialog {
         return campo;
     }
 
+    // Campo com máscara pra placa no formato ABC-1234
     private JFormattedTextField criarCampoPlaca() {
         try {
             MaskFormatter mascara = new MaskFormatter("UUU-####");
             mascara.setPlaceholderCharacter('_');
-            // A máscara já garante o padrão XXX-0000 exigido pelo professor.
+            // A máscara já garante o padrão de 3 letras e 4 números
             return new JFormattedTextField(mascara);
         } catch (java.text.ParseException ex) {
             throw new IllegalStateException("Não foi possível criar máscara para placa", ex);

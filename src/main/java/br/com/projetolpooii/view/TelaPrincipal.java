@@ -1,5 +1,6 @@
 package br.com.projetolpooii.view;
 
+// Janela principal do sistema com o menu
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -18,15 +19,18 @@ public class TelaPrincipal extends JFrame {
         criarMenu();
     }
 
+    // Configurações básicas da janela
     private void configurarJanela() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(new Dimension(900, 600));
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(null); // centraliza na tela
     }
 
+    // Monta a barra de menu com todas as opções do sistema
     private void criarMenu() {
         JMenuBar barra = new JMenuBar();
 
+        // Menu de cadastros (clientes e veículos)
         JMenu menuCadastros = new JMenu("Cadastros");
         JMenuItem itemClientes = new JMenuItem("Clientes");
         itemClientes.addActionListener(e -> new TelaClientes(this, contexto.getClienteControlador()).setVisible(true));
@@ -35,6 +39,7 @@ public class TelaPrincipal extends JFrame {
         menuCadastros.add(itemClientes);
         menuCadastros.add(itemVeiculos);
 
+        // Menu de operações (locar, devolver, vender)
         JMenu menuOperacoes = new JMenu("Operações");
         JMenuItem itemLocacao = new JMenuItem("Locar veículo");
         itemLocacao.addActionListener(e -> new TelaLocacao(this, contexto).setVisible(true));
@@ -46,6 +51,7 @@ public class TelaPrincipal extends JFrame {
         menuOperacoes.add(itemDevolucao);
         menuOperacoes.add(itemVenda);
 
+        // Menu de ajuda com informações sobre o sistema
         JMenu menuAjuda = new JMenu("Ajuda");
         JMenuItem itemSobre = new JMenuItem("Sobre");
         itemSobre.addActionListener(e -> JOptionPane.showMessageDialog(this,

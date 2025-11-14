@@ -1,5 +1,6 @@
 package br.com.projetolpooii.view;
 
+// Tela pra fazer locação de veículos pros clientes
 import br.com.projetolpooii.controller.ClienteControlador;
 import br.com.projetolpooii.controller.LocacaoControlador;
 import br.com.projetolpooii.controller.VeiculoControlador;
@@ -34,6 +35,7 @@ import java.util.List;
 
 public class TelaLocacao extends JDialog {
 
+    // Controladores necessários pra buscar clientes, veículos e fazer a locação
     private final ClienteControlador clienteControlador;
     private final VeiculoControlador veiculoControlador;
     private final LocacaoControlador locacaoControlador;
@@ -62,6 +64,7 @@ public class TelaLocacao extends JDialog {
         setLocationRelativeTo(janelaPai);
     }
 
+    // Monta o layout da tela com filtros, tabela e botões
     private void configurarComponentes() {
         JPanel painelPrincipal = new JPanel(new BorderLayout(8, 8));
         painelPrincipal.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -122,6 +125,7 @@ public class TelaLocacao extends JDialog {
         return painel;
     }
 
+    // Carrega os clientes no combo, pode filtrar por nome ou CPF
     private void carregarClientes(String termo) {
         try {
             List<Cliente> clientes = termo == null || termo.isBlank()
@@ -139,6 +143,7 @@ public class TelaLocacao extends JDialog {
         }
     }
 
+    // Busca veículos disponíveis aplicando os filtros selecionados
     private void carregarVeiculos() {
         try {
             String filtroMarca = campoFiltroMarca.getText().trim();
@@ -157,7 +162,9 @@ public class TelaLocacao extends JDialog {
         }
     }
 
+    // Processa a locação do veículo selecionado pro cliente escolhido
     private void realizarLocacao() {
+        // Validações básicas antes de prosseguir
         if (comboCliente.getSelectedItem() == null) {
             JOptionPane.showMessageDialog(this, "Selecione um cliente.");
             return;

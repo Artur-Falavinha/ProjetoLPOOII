@@ -1,5 +1,6 @@
 package br.com.projetolpooii.model;
 
+// Classe específica pra automóveis
 import br.com.projetolpooii.model.enums.Categoria;
 import br.com.projetolpooii.model.enums.Estado;
 import br.com.projetolpooii.model.enums.Marca;
@@ -35,6 +36,7 @@ public class Automovel extends Veiculo {
         return modelo;
     }
 
+    // Valor da diária varia conforme a categoria do carro
     @Override
     public double getValorDiariaLocacao() {
         return switch (getCategoria()) {
